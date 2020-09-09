@@ -1,16 +1,3 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
 service: voice-foundry-testing
 # app and org for use with dashboard.serverless.com
 app: voice-foundry-v1
@@ -24,29 +11,23 @@ provider:
   name: aws
   runtime: nodejs12.x
 
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
+  # you can overwrite defaults here
+  stage: dev
+  region: us-east-1
 
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+  # you can add statements to the Lambda function's IAM Role here
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "lambda:InvokeFunction"
+        - "s3:ListBucket"
+        - "s3:DeleteObject"
+        - "s3:PutObject"
+      Resource: { "Fn::Join": ["", ["arn:aws:s3:::vf-sample-data"]] }
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+# environment:
+#   BUCKET: vf-sample-data
 
 # you can add packaging information here
 #package:
@@ -116,7 +97,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    NewResource:
+    DataSource:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: vf-sample-data
@@ -124,3 +105,21 @@ resources:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+
+plugins:
+  - serverless-s3-deploy
+  - vf-plugin
+custom:
+  remover:
+    buckets:
+      - vf-sample-data
+  assets:
+    auto: true
+    targets:
+      - bucket:
+          Ref: DataSource
+        empty: true
+        files:
+          - source: ./data/
+            defaultContentType: application/json
+            globs: "sample-data.json"
