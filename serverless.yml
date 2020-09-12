@@ -1,53 +1,125 @@
-service: voice-foundry-testing
+service: aws-exercise
 # app and org for use with dashboard.serverless.com
-app: voice-foundry-v1
-org: nahums
-
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
+# app: voice-foundry-v1
+# org: nahums
 frameworkVersion: "1"
-
 provider:
   name: aws
   runtime: nodejs12.x
-
-  # you can overwrite defaults here
-  stage: dev
+  stage: ${self:custom.stage}
   region: us-east-1
-
   # you can add statements to the Lambda function's IAM Role here
   iamRoleStatements:
-    - Effect: "Allow"
+    - Effect: Allow
       Action:
-        - "lambda:InvokeFunction"
-        - "s3:ListBucket"
-        - "s3:DeleteObject"
-        - "s3:PutObject"
-        - "s3:GetObject"
-      Resource: { "Fn::Join": ["", ["arn:aws:s3:::vf-sample-data"]] }
+        - lambda:InvokeFunction
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - comprehend:DetectSentiment
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - transcribe:*
+      Resource: "*"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        Fn::GetAtt:
+          - transcriptionTable
+          - Arn
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        Fn::GetAtt:
+          - sentimentTable
+          - Arn
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:PutObjectAcl
+      Resource: arn:aws:s3:::${self:custom.audioOutputBucket}/*
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:PutObjectAcl
+      Resource: arn:aws:s3:::${self:custom.audioInputBucket}/*
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+        - s3:PutObjectAcl
+      Resource: arn:aws:s3:::${self:custom.jsonBucket}/*
+    - Effect: Allow
+      Action:
+        - s3:ListBucket
+        - s3:DeleteObject
+        - s3:PutObject
+        - s3:GetObject
+      Resource: arn:aws:s3:::${self:custom.jsonBucket}
+    - Effect: Allow
+      Action:
+        - s3:ListBucket
+        - s3:DeleteObject
+        - s3:PutObject
+        - s3:GetObject
+      Resource: arn:aws:s3:::${self:custom.audioInputBucket}
+    - Effect: Allow
+      Action:
+        - s3:ListBucket
+        - s3:DeleteObject
+        - s3:PutObject
+        - s3:GetObject
+      Resource: arn:aws:s3:::${self:custom.audioOutputBucket}
 
-# you can define service wide environment variables here
-# environment:
-#   BUCKET: vf-sample-data
+  # you can define service wide environment variables here
+  environment:
+    jsonBucket: ${self:custom.jsonBucket}
+    audioInputBucket: ${self:custom.audioInputBucket}
+    audioOutputBucket: ${self:custom.audioOutputBucket}
+    sentimentTable: ${self:custom.sentimentTable}
+    transcriptionTable: ${self:custom.transcriptionTable}
+    audioFile: audio-sample.m4a
+    jsonFile: sample-data.json
+    transcriptionJobName: ${self:service}-transcriptionjob-${sls:instanceId}
+    analyzeAudioLambda: ${self:custom.analyzeDataLambda }
 
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
+  s3:
+    outputAudioBucket:
+      name: ${self:custom.audioOutputBucket}
+      accessControl: PublicRead
+      publicAccessBlockConfiguration: false
 
 functions:
-  hello:
-    handler: handler.hello
   analyzeData:
+    name: ${self:custom.analyzeDataLambda}
     handler: handler.analyzeData
-
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
+  transcribeAudio:
+    name: ${self:custom.transcribeAudioLambda}
+    handler: handler.analyzeAudio
+  saveAudio:
+    name: ${self:custom.saveAudioLambda}
+    handler: handler.saveAudio
+    events:
+      - s3:
+          bucket: ${self:custom.audioOutputBucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .json
 
 # you can add CloudFormation resource templates here
 resources:
@@ -55,7 +127,7 @@ resources:
     sentimentTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ChatSentimentTable
+        TableName: ${self:custom.sentimentTable}
         AttributeDefinitions:
           - AttributeName: uid
             AttributeType: S
@@ -69,30 +141,68 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-    DataSource:
+    transcriptionTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.transcriptionTable}
+        AttributeDefinitions:
+          - AttributeName: guid
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: guid
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    JSONDataSource:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: vf-sample-data
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+        BucketName: ${self:custom.jsonBucket}
+    AudioDataSource:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.audioInputBucket}
 
 plugins:
-  - serverless-s3-deploy
-  # - vf-plugin
+  - serverless-s3-remover
+  - refactor-s3-deploy
 custom:
   remover:
+    prompt: true
     buckets:
-      - vf-sample-data
+      - ${self:custom.jsonBucket}
+      - ${self:custom.audioInputBucket}
+      - ${self:custom.audioOutputBucket}
+  globalPrefix: "voice-foundry-"
+  stage: ${opt:stage, 'dev'}
+  lambdaPrefix: ${self:custom.globalPrefix}${self:service}
+  analyzeDataLambda: ${self:custom.lambdaPrefix}_analyzeData_${self:custom.stage}
+  transcribeAudioLambda: ${self:custom.lambdaPrefix}_transcribeAudio_${self:custom.stage}
+  saveAudioLambda: ${self:custom.lambdaPrefix}_saveAudio_${self:custom.stage}
+  jsonBucket: ${self:service}-sample-data-json-${self:custom.stage}
+  audioInputBucket: ${self:service}-sample-data-audio-${self:custom.stage}
+  audioOutputBucket: ${self:service}-sample-transcribed-audio-output-${self:custom.stage}
+  sentimentTable: ChatSentimentTable_${self:service}-${self:custom.stage}
+  transcriptionTable: TranscriptionTable_${self:service}-${self:custom.stage}
   assets:
+    verbose: true
     auto: true
     targets:
       - bucket:
-          Ref: DataSource
-        empty: true
+          Ref: JSONDataSource
         acl: public-read
         files:
           - source: ./data/
             defaultContentType: application/json
             globs: "sample-data.json"
+      - bucket:
+          Ref: AudioDataSource
+        acl: public-read
+        files:
+          - source: ./data/
+            defaultContentType: audio/mpeg
+            globs: "audio-sample.m4a"

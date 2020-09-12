@@ -8,16 +8,19 @@ class Deploy {
     this.serverless = serverless;
     this.commands = {
       deploy: {
-        lifecycleEvents: ["resources", "functions", "deploy"],
+        lifecycleEvents: ["deploy"],
       },
     };
     this.hooks = {
-      "after:deploy:deploy": this.afterDeploy,
+      "after:deploy:deploy": () => Promise.resolve().then(this.logDeployDone.bind(this)),
     };
   }
-  afterDeploy = (serverless) => {
+  logDeployDone() {
+    console.log('deploy finished son')
+  }
+  afterDeploy = () => {
     var params = {
-      FunctionName: "voice-foundry-testing-dev-hello",
+      FunctionName: this.serverless.service.custom.analyzeDataLambda
     };
     lambda.invoke(params, function (err, data) {
       if (err) console.log(err, err.stack);
