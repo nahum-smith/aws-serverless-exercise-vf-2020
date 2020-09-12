@@ -1,0 +1,36 @@
+{
+    "Records": [{
+        "eventVersion": "2.1",
+        "eventSource": "aws:s3",
+        "awsRegion": "us-east-1",
+        "eventTime": "2020-09-11T10:16:03.496Z",
+        "eventName": "ObjectCreated:Put",
+        "userIdentity": {
+            "principalId": "AWS:AIDA2TBPOHOY6W4UTXJ3C"
+        },
+        "requestParameters": {
+            "sourceIPAddress": "108.54.120.224"
+        },
+        "responseElements": {
+            "x-amz-request-id": "B9B6C4D70BD6AB0E",
+            "x-amz-id-2": "1HyavLJ3/8yTq+JIs2NFdYL6AoBkbaO+hHlSG9EtGUchlhxpxM6yFq9fVHk85ttGmMe2Rwl0aNcpQ9UQQYQLOn3nQAXxlrgS"
+        },
+        "s3": {
+            "s3SchemaVersion": "1.0",
+            "configurationId": "9a14746c-df3f-4f24-b9f9-886705e64bb0",
+            "bucket": {
+                "name": "voice-foundry-aws-exercise-sample-transcribed-audio-output-dev",
+                "ownerIdentity": {
+                    "principalId": "A31QA44OF7SASK"
+                },
+                "arn": "arn:aws:s3:::voice-foundry-aws-exercise-sample-transcribed-audio-output-dev"
+            },
+            "object": {
+                "key": "aws-exercise-transcriptionjob-1599772605124.json",
+                "size": 5966,
+                "eTag": "6696eef699b962fda7b1920d90ff2878",
+                "sequencer": "005F5B4E65CA3E9E5B"
+            }
+        }
+    }]
+}

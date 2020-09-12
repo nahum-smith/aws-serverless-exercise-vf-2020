@@ -1,0 +1,62 @@
+[{
+    "name": "Joe",
+    "type": "customer",
+    "message": "I am extremely upset about this service!  Let me speak to a manager, now!",
+    "timestamp": "2020-09-09T21:41:17.720Z",
+    "uid": "e9cccd80-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Jane",
+    "type": "rep",
+    "message": "We are very sorry to hear this.  Are you sure there is nothing I can help you with?",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf490-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Joe",
+    "type": "customer",
+    "message": "Absolutely not!  This is ridiculous.  I was a refund.",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf491-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Jane",
+    "type": "rep",
+    "message": "We can assist with this.  It would be my pleasure.",
+
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf492-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Felicity",
+    "type": "manager",
+    "message": "Hi Joe.  I would be happy to refund you your money, and give you free service for a year.",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf493-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Joe",
+    "type": "customer",
+    "message": "Well that is better.  I assume I will receive this refund on my next bill?",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf494-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Felicity",
+    "type": "manager",
+    "message": "That is correct Joe.",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf495-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Joe",
+    "type": "customer",
+    "message": "Great!  Now I can use the service for a year at no cost to me.  This is wonderful.  Thank you Felicity!",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf496-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Felicity",
+    "type": "manager",
+    "message": "Sure Joe, I am happy to have helped you today.  Is there anything else?",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf497-f2e4-11ea-8233-bb747a99165f"
+}, {
+    "name": "Joe",
+    "type": "customer",
+    "message": "Not at all.  Have a great day!",
+    "timestamp": "2020-09-09T21:41:17.721Z",
+    "uid": "e9ccf498-f2e4-11ea-8233-bb747a99165f"
+}]

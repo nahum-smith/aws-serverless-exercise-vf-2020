@@ -1,0 +1,17 @@
+{
+  "name": "vf-exercise-2020",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "dependencies": {
+    "aws-sdk": "^2.748.0",
+    "bluebird": "^3.7.2",
+    "glob-all": "^3.2.1",
+    "mime-types": "^2.1.27",
+    "serverless-s3-remover": "^0.6.0",
+    "uuid": "^8.3.0"
+  }
+}
