@@ -120,73 +120,72 @@ class ChatMessageManager {
     console.log("Batch analyzing messages ...");
     return Promise.all(
       this.messages.map(async (item) => {
-          return new Promise((resolve, reject) => {
-              try {
-                const sentimentRes = await this.detectSentiment(item.message);
-                var params = {
-                    Item: {
-                      uid: {
-                        S: item.uid,
-                      },
-                      name: {
-                        S: item.name,
-                      },
-                      type: {
-                        S: item.type,
-                      },
-                      message: {
-                        S: item.message,
-                      },
-                      timestamp: {
-                        S: item.timestamp,
-                      },
-                      sentiment: {
-                        S: sentimentRes.Sentiment,
-                      },
-                      positiveValue: {
-                        N: sentimentRes.SentimentScore.Positive.toString(),
-                      },
-                      negativeScore: {
-                        N: sentimentRes.SentimentScore.Negative.toString(),
-                      },
-                      neutralScore: {
-                        N: sentimentRes.SentimentScore.Neutral.toString(),
-                      },
-                      mixedScore: {
-                        N: sentimentRes.SentimentScore.Mixed.toString(),
-                      },
-                    },
-                    ReturnConsumedCapacity: "TOTAL",
-                    TableName: process.env.sentimentTable,
-                  };
-                  console.log(
-                    "Saving sentiment results to dynamo: ",
-                    JSON.stringify(params)
-                  );
-                  this.db.putItem(params, function (err, data) {
-                    if (err) {
-                      console.log("Error saving to dynamo: ", JSON.stringify(err));
-                      reject({
-                        ok: false,
-                        data: item,
-                        error: err,
-                        message: "Message not saved",
-                      });
-                    } else {
-                      resolve({
-                        ok: true,
-                        data: item.uid,
-                        sentiment: sentimentRes.Sentiment,
-                        message: "Message Saved",
-                      });
-                    }
-                  });
+        return new Promise(async (resolve, reject) => {
+          try {
+            const sentimentRes = await this.detectSentiment(item.message);
+            var params = {
+              Item: {
+                uid: {
+                  S: item.uid,
+                },
+                name: {
+                  S: item.name,
+                },
+                type: {
+                  S: item.type,
+                },
+                message: {
+                  S: item.message,
+                },
+                timestamp: {
+                  S: item.timestamp,
+                },
+                sentiment: {
+                  S: sentimentRes.Sentiment,
+                },
+                positiveValue: {
+                  N: sentimentRes.SentimentScore.Positive.toString(),
+                },
+                negativeScore: {
+                  N: sentimentRes.SentimentScore.Negative.toString(),
+                },
+                neutralScore: {
+                  N: sentimentRes.SentimentScore.Neutral.toString(),
+                },
+                mixedScore: {
+                  N: sentimentRes.SentimentScore.Mixed.toString(),
+                },
+              },
+              ReturnConsumedCapacity: "TOTAL",
+              TableName: process.env.sentimentTable,
+            };
+            console.log(
+              "Saving sentiment results to dynamo: ",
+              JSON.stringify(params)
+            );
+            this.db.putItem(params, function (err, data) {
+              if (err) {
+                console.log("Error saving to dynamo: ", JSON.stringify(err));
+                reject({
+                  ok: false,
+                  data: item,
+                  error: err,
+                  message: "Message not saved",
+                });
+              } else {
+                resolve({
+                  ok: true,
+                  data: item.uid,
+                  sentiment: sentimentRes.Sentiment,
+                  message: "Message Saved",
+                });
               }
-              catch(err) {
-                  console.log('Error: ', JSON.stringify(err))
-                  reject(err)
-              }
-          });
+            });
+          } catch (err) {
+            console.log("Error: ", JSON.stringify(err));
+            reject(err);
+          }
+        });
       })
     );
   }

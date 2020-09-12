@@ -1,6 +1,10 @@
 const { getDataUsingS3, AudioManager } = require("../utils/utils.js");
 
 module.exports.default = async (event) => {
+  console.log(
+    "Transcription bucket triggered with new results: ",
+    JSON.stringify(event)
+  );
   try {
     const {
       s3: {

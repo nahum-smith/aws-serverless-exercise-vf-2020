@@ -9,7 +9,15 @@ module.exports.default = async (event) => {
     );
     // Log for Debugging in Cloudwatch
     console.log("TRANSCRIBE RESULTS: ", JSON.stringify(res));
+    return {
+      ok: true,
+      transcribeResults: res,
+    };
   } catch (err) {
     console.log("TRANSCRIBE ERROR: ", JSON.stringify(err));
+    return {
+      ok: false,
+      err,
+    };
   }
 };

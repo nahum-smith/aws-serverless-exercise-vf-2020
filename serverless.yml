@@ -183,9 +183,9 @@ custom:
   analyzeDataLambda: ${self:custom.lambdaPrefix}_analyzeData_${self:custom.stage}
   transcribeAudioLambda: ${self:custom.lambdaPrefix}_transcribeAudio_${self:custom.stage}
   saveAudioLambda: ${self:custom.lambdaPrefix}_saveAudio_${self:custom.stage}
-  jsonBucket: ${self:service}-sample-data-json-${self:custom.stage}
-  audioInputBucket: ${self:service}-sample-data-audio-${self:custom.stage}
-  audioOutputBucket: ${self:service}-sample-transcribed-audio-output-${self:custom.stage}
+  jsonBucket: data-json-${self:custom.stage}-${sls:instanceId}
+  audioInputBucket: data-audio-${self:custom.stage}-${sls:instanceId}
+  audioOutputBucket: transcribed-audio-output-${self:custom.stage}-${sls:instanceId}
   sentimentTable: ChatSentimentTable_${self:service}-${self:custom.stage}
   transcriptionTable: TranscriptionTable_${self:service}-${self:custom.stage}
   assets:
