@@ -1,14 +1,10 @@
 service: aws-exercise
-# app and org for use with dashboard.serverless.com
-# app: voice-foundry-v1
-# org: nahums
 frameworkVersion: "1"
 provider:
   name: aws
   runtime: nodejs12.x
   stage: ${self:custom.stage}
   region: us-east-1
-  # you can add statements to the Lambda function's IAM Role here
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -85,8 +81,6 @@ provider:
         - s3:PutObject
         - s3:GetObject
       Resource: arn:aws:s3:::${self:custom.audioOutputBucket}
-
-  # you can define service wide environment variables here
   environment:
     jsonBucket: ${self:custom.jsonBucket}
     audioInputBucket: ${self:custom.audioInputBucket}
@@ -120,8 +114,6 @@ functions:
           event: s3:ObjectCreated:*
           rules:
             - suffix: .json
-
-# you can add CloudFormation resource templates here
 resources:
   Resources:
     sentimentTable:
