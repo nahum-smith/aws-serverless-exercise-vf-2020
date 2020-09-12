@@ -1,5 +1,7 @@
 "use strict";
 
+// Many thanks to https://github.com/funkybob/serverless-s3-deploy for all of the deployment code in this plugin was extracted from his plugin.  
+
 const glob = require("glob-all");
 const fs = require("fs");
 const path = require("path");
@@ -28,9 +30,7 @@ class Assets {
       };
     }
 
-    this.config = Object.assign(
-      {},
-      {
+    this.config = Object.assign({}, {
         auto: false,
         verbose: false,
         resolveReferences: true,
@@ -121,7 +121,9 @@ class Assets {
           },
         };
 
-        listedObjects.Contents.forEach(({ Key }) => {
+        listedObjects.Contents.forEach(({
+          Key
+        }) => {
           deleteParams.Delete.Objects.push({
             Key,
           });
@@ -188,8 +190,7 @@ class Assets {
                   // therefore replace all backslashes with slashes
                   const key = path.join(prefix, filename).replace(/\\/g, "/");
 
-                  const details = Object.assign(
-                    {
+                  const details = Object.assign({
                       ACL: assets.acl || "private",
                       Body: body,
                       Bucket: bucket,
@@ -203,8 +204,7 @@ class Assets {
                 });
               });
             });
-        },
-        {
+        }, {
           concurrency: 3,
         }
       );
